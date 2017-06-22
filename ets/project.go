@@ -87,11 +87,34 @@ type Area struct {
 	Lines   []Line
 }
 
+// GroupAddressID is the ID of a group address.
+type GroupAddressID string
+
+// GroupAddress is a group address.
+type GroupAddress struct {
+	ID      GroupAddressID
+	Name    string
+	Address uint
+}
+
+// GroupRangeID is the ID of a group range.
+type GroupRangeID string
+
+// GroupRange is a range of group addresses.
+type GroupRange struct {
+	ID         GroupRangeID
+	Name       string
+	RangeStart uint
+	RangeEnd   uint
+	Addresses  []GroupAddress
+	SubRanges  []GroupRange
+}
+
 // Installation is an installation within a project.
 type Installation struct {
 	Name           string
 	Topology       []Area
-	GroupAddresses []struct{}
+	GroupAddresses []GroupRange
 }
 
 // Project contains an entire project.

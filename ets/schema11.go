@@ -97,12 +97,55 @@ func (a *area11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	return nil
 }
 
+type groupRange11 GroupRange
+
+func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var doc struct {
+		ID           string `xml:"Id,attr"`
+		Name         string `xml:"Name,attr"`
+		RangeStart   uint   `xml:"RangeStart,attr"`
+		RangeEnd     uint   `xml:"RangeEnd,attr"`
+		GroupAddress []struct {
+			ID      string `xml:"Id,attr"`
+			Name    string `xml:"Name,attr"`
+			Address uint   `xml:"Address,attr"`
+		}
+		GroupRange []groupRange11
+	}
+
+	if err := d.DecodeElement(&doc, &start); err != nil {
+		return err
+	}
+
+	gar.ID = GroupRangeID(doc.ID)
+	gar.Name = doc.Name
+	gar.RangeStart = doc.RangeStart
+	gar.RangeEnd = doc.RangeEnd
+	gar.Addresses = make([]GroupAddress, len(doc.GroupAddress))
+	gar.SubRanges = make([]GroupRange, len(doc.GroupRange))
+
+	for n, docGrpAddr := range doc.GroupAddress {
+		gar.Addresses[n] = GroupAddress{
+			ID:      GroupAddressID(docGrpAddr.ID),
+			Name:    docGrpAddr.Name,
+			Address: docGrpAddr.Address,
+		}
+	}
+
+	for n, docGrpRange := range doc.GroupRange {
+		gar.SubRanges[n] = GroupRange(docGrpRange)
+	}
+
+	return nil
+}
+
 type installation11 Installation
 
 func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
-		Name     string   `xml:"Name,attr"`
-		Topology []area11 `xml:"Topology>Area"`
+		Name        string         `xml:"Name,attr"`
+		Areas       []area11       `xml:"Topology>Area"`
+		GroupRanges []groupRange11 `xml:"GroupAddresses>GroupRanges>GroupRange"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
@@ -110,10 +153,15 @@ func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	}
 
 	i.Name = doc.Name
-	i.Topology = make([]Area, len(doc.Topology))
+	i.Topology = make([]Area, len(doc.Areas))
+	i.GroupAddresses = make([]GroupRange, len(doc.GroupRanges))
 
-	for n, docArea := range doc.Topology {
+	for n, docArea := range doc.Areas {
 		i.Topology[n] = Area(docArea)
+	}
+
+	for n, docGrpRange := range doc.GroupRanges {
+		i.GroupAddresses[n] = GroupRange(docGrpRange)
 	}
 
 	return nil
