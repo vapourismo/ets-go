@@ -19,12 +19,38 @@ type InstallationFile struct {
 	*zip.File
 }
 
+// Decode the file in order to retrieve the project inside it.
+func (i *InstallationFile) Decode() (p *Project, err error) {
+	r, err := i.Open()
+	if err != nil {
+		return
+	}
+
+	p, err = DecodeProject(r)
+	r.Close()
+
+	return
+}
+
 // ProjectFile is a file that contains project information.
 type ProjectFile struct {
 	*zip.File
 
 	ProjectID         string
 	InstallationFiles []InstallationFile
+}
+
+// Decode the file in order to retrieve the project info inside it.
+func (pf *ProjectFile) Decode() (pi *ProjectInfo, err error) {
+	r, err := pf.Open()
+	if err != nil {
+		return
+	}
+
+	pi, err = DecodeProjectInfo(r)
+	r.Close()
+
+	return
 }
 
 var projectFileBaseRe = regexp.MustCompile("^\\d.xml$")

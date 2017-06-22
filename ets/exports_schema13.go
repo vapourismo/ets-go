@@ -5,8 +5,11 @@ package ets
 
 import "encoding/xml"
 
-// unmarshalProject13 extracts project information from the current element.
-func unmarshalProjectInfo13(d *xml.Decoder, start xml.StartElement, proj *ProjectInfo) error {
+func unmarshalProjectInfo13(d *xml.Decoder, start xml.StartElement, pi *ProjectInfo) error {
 	// Schema 11 and 13 are compatible for our purposes.
-	return unmarshalProjectInfo11(d, start, proj)
+	return unmarshalProjectInfo11(d, start, pi)
+}
+
+func unmarshalProject13(d *xml.Decoder, start xml.StartElement, p *Project) error {
+	return unmarshalProject11(d, start, p)
 }
