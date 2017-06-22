@@ -5,7 +5,7 @@ package ets
 
 import (
 	"archive/zip"
-	"encoding/xml"
+	"path"
 	"regexp"
 )
 
@@ -14,51 +14,33 @@ const (
 	schema13Namespace = "http://knx.org/xml/project/13"
 )
 
-// ProjectFile is a project file.
-type ProjectFile struct {
-	ProjectID   string
-	ProjectName string
+// InstallationFile is a file that contains zero or more project installations.
+type InstallationFile struct {
+	*zip.File
 }
 
-var (
-	projectFileBaseRe = regexp.MustCompile("^\\d.xml$")
-)
+// ProjectFile is a file that contains project information.
+type ProjectFile struct {
+	*zip.File
 
-// newProjectFile inspects a project meta file in order to find the real project file.
-func newProjectFile(archive *zip.ReadCloser, metaFile *zip.File) (proj ProjectFile, err error) {
-	r, err := metaFile.Open()
-	if err != nil {
-		return
-	}
+	ProjectID         string
+	InstallationFiles []InstallationFile
+}
 
-	var meta struct {
-		Project struct {
-			ID                 string `xml:"Id,attr"`
-			ProjectInformation struct {
-				Name string `xml:"Name,attr"`
-			}
+var projectFileBaseRe = regexp.MustCompile("^\\d.xml$")
+
+func newProjectFile(archive *zip.ReadCloser, metaFile *zip.File) (projFile ProjectFile) {
+	projectDir := path.Dir(metaFile.Name)
+
+	projFile.File = metaFile
+	projFile.ProjectID = projectDir
+
+	// Search for the project installation file.
+	for _, file := range archive.File {
+		if path.Dir(file.Name) == projectDir && projectFileBaseRe.MatchString(path.Base(file.Name)) {
+			projFile.InstallationFiles = append(projFile.InstallationFiles, InstallationFile{file})
 		}
 	}
-
-	// Extract information from the meta file.
-	err = xml.NewDecoder(r).Decode(&meta)
-	r.Close()
-
-	if err != nil {
-		return
-	}
-
-	proj.ProjectID = meta.Project.ID
-	proj.ProjectName = meta.Project.ProjectInformation.Name
-
-	// projectDir := path.Dir(metaFile.Name)
-
-	// // Search for the actual project file.
-	// for _, file := range archive.File {
-	// 	if path.Dir(file.Name) == projectDir && projectFileBaseRe.MatchString(path.Base(file.Name)) {
-	// 		proj.InstallationFiles = append(proj.InstallationFiles, InstallationFile{file})
-	// 	}
-	// }
 
 	return
 }
@@ -103,17 +85,10 @@ var (
 	// TODO: Figure out if '/' is a universal path seperator in ZIP files.
 )
 
-// findFiles goes through the list of files inside the archive in order to find relevant files.
 func (ex *ExportArchive) findFiles() error {
 	for _, file := range ex.archive.File {
 		if projectMetaFileRe.MatchString(file.Name) {
-			// Process meta file in order to find the project file.
-			projFile, err := newProjectFile(ex.archive, file)
-			if err != nil {
-				return err
-			}
-
-			ex.ProjectFiles = append(ex.ProjectFiles, projFile)
+			ex.ProjectFiles = append(ex.ProjectFiles, newProjectFile(ex.archive, file))
 		} else if matches := manufacturerFileRe.FindStringSubmatch(file.Name); matches != nil {
 			ex.ManufacturerFiles = append(ex.ManufacturerFiles, ManufacturerFile{
 				File:           file,

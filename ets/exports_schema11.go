@@ -5,8 +5,8 @@ package ets
 
 import "encoding/xml"
 
-// unmarshalProject11 extracts project information from the current element.
-func unmarshalProject11(d *xml.Decoder, start xml.StartElement, proj *Project) error {
+// unmarshalProjectInfo11 extracts project information from the current element.
+func unmarshalProjectInfo11(d *xml.Decoder, start xml.StartElement, proj *ProjectInfo) error {
 	var doc struct {
 		Project struct {
 			ID                 string `xml:"Id,attr"`
