@@ -5,6 +5,8 @@ package ets
 
 import "encoding/xml"
 
+const schema11Namespace = "http://knx.org/xml/project/11"
+
 func unmarshalProjectInfo11(d *xml.Decoder, start xml.StartElement, pi *ProjectInfo) error {
 	var doc struct {
 		Project struct {

@@ -5,11 +5,14 @@ package ets
 
 import "encoding/xml"
 
+const schema13Namespace = "http://knx.org/xml/project/13"
+
 func unmarshalProjectInfo13(d *xml.Decoder, start xml.StartElement, pi *ProjectInfo) error {
 	// Schema 11 and 13 are compatible for our purposes.
 	return unmarshalProjectInfo11(d, start, pi)
 }
 
 func unmarshalProject13(d *xml.Decoder, start xml.StartElement, p *Project) error {
+	// Schema 11 and 13 are compatible for our purposes.
 	return unmarshalProject11(d, start, p)
 }

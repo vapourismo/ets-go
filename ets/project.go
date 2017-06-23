@@ -37,6 +37,9 @@ func (pi *ProjectInfo) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	case schema11Namespace:
 		return unmarshalProjectInfo11(d, start, pi)
 
+	case schema12Namespace:
+		return unmarshalProjectInfo12(d, start, pi)
+
 	case schema13Namespace:
 		return unmarshalProjectInfo13(d, start, pi)
 
@@ -147,6 +150,9 @@ func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	switch ns {
 	case schema11Namespace:
 		return unmarshalProject11(d, start, p)
+
+	case schema12Namespace:
+		return unmarshalProject12(d, start, p)
 
 	case schema13Namespace:
 		return unmarshalProject13(d, start, p)

@@ -9,11 +9,6 @@ import (
 	"regexp"
 )
 
-const (
-	schema11Namespace = "http://knx.org/xml/project/11"
-	schema13Namespace = "http://knx.org/xml/project/13"
-)
-
 // InstallationFile is a file that contains zero or more project installations.
 type InstallationFile struct {
 	*zip.File
