@@ -90,10 +90,10 @@ type LineID string
 
 // Line is a line.
 type Line struct {
-	ID               LineID
-	Name             string
-	Address          uint
-	DevicesInstances []DeviceInstance
+	ID      LineID
+	Name    string
+	Address uint
+	Devices []DeviceInstance
 }
 
 // AreaID is the ID of an area.

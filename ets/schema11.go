@@ -93,10 +93,10 @@ func (l *line11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	l.ID = LineID(doc.ID)
 	l.Name = doc.Name
 	l.Address = doc.Address
-	l.DevicesInstances = make([]DeviceInstance, len(doc.DeviceInstance))
+	l.Devices = make([]DeviceInstance, len(doc.DeviceInstance))
 
 	for n, docDeviceInstance := range doc.DeviceInstance {
-		l.DevicesInstances[n] = DeviceInstance(docDeviceInstance)
+		l.Devices[n] = DeviceInstance(docDeviceInstance)
 	}
 
 	return nil
