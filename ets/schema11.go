@@ -29,9 +29,19 @@ type deviceInstance11 DeviceInstance
 
 func (di *deviceInstance11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
-		ID      string `xml:"Id,attr"`
-		Name    string `xml:"Name,attr"`
-		Address uint   `xml:"Address,attr"`
+		ID         string `xml:"Id,attr"`
+		Name       string `xml:"Name,attr"`
+		Address    uint   `xml:"Address,attr"`
+		ComObjects []struct {
+			RefID         string `xml:"RefId,attr"`
+			DatapointType string `xml:"DatapointType,attr"`
+			Connectors    struct {
+				Elements []struct {
+					XMLName xml.Name
+					RefID   string `xml:"GroupAddressRefId,attr"`
+				} `xml:",any"`
+			}
+		} `xml:"ComObjectInstanceRefs>ComObjectInstanceRef"`
 	}
 
 	if err := d.DecodeElement(&doc, &start); err != nil {
@@ -41,6 +51,25 @@ func (di *deviceInstance11) UnmarshalXML(d *xml.Decoder, start xml.StartElement)
 	di.ID = DeviceInstanceID(doc.ID)
 	di.Name = doc.Name
 	di.Address = doc.Address
+	di.ComObjects = make([]ComObjectInstanceRef, len(doc.ComObjects))
+
+	for n, docComObj := range doc.ComObjects {
+		comObj := ComObjectInstanceRef{
+			RefID:         ComObjectRefID(docComObj.RefID),
+			DatapointType: docComObj.DatapointType,
+			Connectors:    make([]Connector, len(docComObj.Connectors.Elements)),
+		}
+
+		for m, docConnElem := range docComObj.Connectors.Elements {
+			comObj.Connectors[m] = Connector{
+				Receive: docConnElem.XMLName.Local == "Receive",
+				RefID:   GroupAddressID(docConnElem.RefID),
+			}
+		}
+
+		di.ComObjects[n] = comObj
+
+	}
 
 	return nil
 }

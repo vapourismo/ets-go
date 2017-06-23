@@ -55,14 +55,31 @@ func DecodeProjectInfo(r io.Reader) (*ProjectInfo, error) {
 	return info, nil
 }
 
+// Connector is a connection to a group address.
+type Connector struct {
+	Receive bool
+	RefID   GroupAddressID
+}
+
+// ComObjectRefID is the ID of a communication object reference.
+type ComObjectRefID string
+
+// ComObjectInstanceRef connects a communication object reference with zero or more group addresses.
+type ComObjectInstanceRef struct {
+	RefID         ComObjectRefID
+	DatapointType string
+	Connectors    []Connector
+}
+
 // DeviceInstanceID is the ID of a device instance.
 type DeviceInstanceID string
 
 // DeviceInstance is a device instance.
 type DeviceInstance struct {
-	ID      DeviceInstanceID
-	Name    string
-	Address uint
+	ID         DeviceInstanceID
+	Name       string
+	Address    uint
+	ComObjects []ComObjectInstanceRef
 }
 
 // LineID is the ID of a line.
