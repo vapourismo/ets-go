@@ -219,3 +219,97 @@ func unmarshalProject11(d *xml.Decoder, start xml.StartElement, p *Project) erro
 
 	return nil
 }
+
+type comObject11 ComObject
+
+func (co *comObject11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var doc struct {
+		ID                string `xml:"Id,attr"`
+		Name              string `xml:",attr"`
+		Text              string `xml:",attr"`
+		Description       string `xml:",attr"`
+		FunctionText      string `xml:",attr"`
+		ObjectSize        string `xml:",attr"`
+		DatapointType     string `xml:",attr"`
+		Priority          string `xml:",attr"`
+		ReadFlag          string `xml:",attr"`
+		WriteFlag         string `xml:",attr"`
+		CommunicationFlag string `xml:",attr"`
+		TransmitFlag      string `xml:",attr"`
+		UpdateFlag        string `xml:",attr"`
+		ReadOnInitFlag    string `xml:",attr"`
+	}
+
+	if err := d.DecodeElement(&doc, &start); err != nil {
+		return err
+	}
+
+	co.ID = ComObjectID(doc.ID)
+	co.Name = doc.Name
+	co.Text = doc.Text
+	co.Description = doc.Description
+	co.FunctionText = doc.FunctionText
+	co.ObjectSize = doc.ObjectSize
+	co.DatapointType = doc.DatapointType
+	co.Priority = doc.Priority
+	co.ReadFlag = doc.ReadFlag == "Enabled"
+	co.WriteFlag = doc.WriteFlag == "Enabled"
+	co.CommunicationFlag = doc.CommunicationFlag == "Enabled"
+	co.TransmitFlag = doc.TransmitFlag == "Enabled"
+	co.UpdateFlag = doc.UpdateFlag == "Enabled"
+	co.ReadOnInitFlag = doc.ReadOnInitFlag == "Enabled"
+
+	return nil
+}
+
+type applicationProgram11 ApplicationProgram
+
+func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var doc struct {
+		ID      string `xml:"Id,attr"`
+		Name    string `xml:",attr"`
+		Version uint   `xml:"ApplicationVersion,attr"`
+		Static  struct {
+			ComObjects []comObject11 `xml:"ComObjectTable>ComObject"`
+		}
+	}
+
+	if err := d.DecodeElement(&doc, &start); err != nil {
+		return err
+	}
+
+	ap.ID = ApplicationProgramID(doc.ID)
+	ap.Name = doc.Name
+	ap.Version = doc.Version
+	ap.ComObjects = make([]ComObject, len(doc.Static.ComObjects))
+
+	for n, docComObj := range doc.Static.ComObjects {
+		ap.ComObjects[n] = ComObject(docComObj)
+	}
+
+	return nil
+}
+
+type manufacturerData11 ManufacturerData
+
+func (md *manufacturerData11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var doc struct {
+		Manufacturer struct {
+			ID       string                 `xml:"RefId,attr"`
+			Programs []applicationProgram11 `xml:"ApplicationPrograms>ApplicationProgram"`
+		} `xml:"ManufacturerData>Manufacturer"`
+	}
+
+	if err := d.DecodeElement(&doc, &start); err != nil {
+		return err
+	}
+
+	md.Manufacturer = ManufacturerID(doc.Manufacturer.ID)
+	md.Programs = make([]ApplicationProgram, len(doc.Manufacturer.Programs))
+
+	for n, docProg := range doc.Manufacturer.Programs {
+		md.Programs[n] = ApplicationProgram(docProg)
+	}
+
+	return nil
+}

@@ -83,6 +83,19 @@ type ManufacturerFile struct {
 	ContentID      string
 }
 
+// Decode the file in order to retrieve the manufacturer data inside it.
+func (mf *ManufacturerFile) Decode() (md *ManufacturerData, err error) {
+	r, err := mf.Open()
+	if err != nil {
+		return
+	}
+
+	md, err = DecodeManufacturerData(r)
+	r.Close()
+
+	return
+}
+
 // ExportArchive is a handle to an exported archive (.knxproj or .knxprod).
 type ExportArchive struct {
 	archive *zip.ReadCloser
