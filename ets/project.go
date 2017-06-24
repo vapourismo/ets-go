@@ -23,7 +23,8 @@ func getNamespace(start xml.StartElement) (ns string) {
 // ProjectID is a project identifier.
 type ProjectID string
 
-// ProjectInfo contains project information.
+// ProjectInfo contains project information. These information are usually stored in
+// the P-XXXX/Project.xml file.
 type ProjectInfo struct {
 	ID   ProjectID
 	Name string
@@ -137,7 +138,8 @@ type Installation struct {
 	GroupAddresses []GroupRange
 }
 
-// Project contains an entire project.
+// Project contains an entire project. These information are usually stored within a file located
+// at P-XXXX/N.xml (0 <= N <= 16).
 type Project struct {
 	ID            ProjectID
 	Installations []Installation
