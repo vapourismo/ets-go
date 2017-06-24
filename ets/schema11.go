@@ -12,7 +12,7 @@ func unmarshalProjectInfo11(d *xml.Decoder, start xml.StartElement, pi *ProjectI
 		Project struct {
 			ID                 string `xml:"Id,attr"`
 			ProjectInformation struct {
-				Name string `xml:"Name,attr"`
+				Name string `xml:",attr"`
 			}
 		}
 	}
@@ -32,11 +32,11 @@ type deviceInstance11 DeviceInstance
 func (di *deviceInstance11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		ID         string `xml:"Id,attr"`
-		Name       string `xml:"Name,attr"`
-		Address    uint   `xml:"Address,attr"`
+		Name       string `xml:",attr"`
+		Address    uint   `xml:",attr"`
 		ComObjects []struct {
 			RefID         string `xml:"RefId,attr"`
-			DatapointType string `xml:"DatapointType,attr"`
+			DatapointType string `xml:",attr"`
 			Connectors    struct {
 				Elements []struct {
 					XMLName xml.Name
@@ -81,8 +81,8 @@ type line11 Line
 func (l *line11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		ID             string `xml:"Id,attr"`
-		Name           string `xml:"Name,attr"`
-		Address        uint   `xml:"Address,attr"`
+		Name           string `xml:",attr"`
+		Address        uint   `xml:",attr"`
 		DeviceInstance []deviceInstance11
 	}
 
@@ -107,8 +107,8 @@ type area11 Area
 func (a *area11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		ID      string `xml:"Id,attr"`
-		Name    string `xml:"Name,attr"`
-		Address uint   `xml:"Address,attr"`
+		Name    string `xml:",attr"`
+		Address uint   `xml:",attr"`
 		Line    []line11
 	}
 
@@ -133,13 +133,13 @@ type groupRange11 GroupRange
 func (gar *groupRange11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		ID           string `xml:"Id,attr"`
-		Name         string `xml:"Name,attr"`
-		RangeStart   uint   `xml:"RangeStart,attr"`
-		RangeEnd     uint   `xml:"RangeEnd,attr"`
+		Name         string `xml:",attr"`
+		RangeStart   uint   `xml:",attr"`
+		RangeEnd     uint   `xml:",attr"`
 		GroupAddress []struct {
 			ID      string `xml:"Id,attr"`
-			Name    string `xml:"Name,attr"`
-			Address uint   `xml:"Address,attr"`
+			Name    string `xml:",attr"`
+			Address uint   `xml:",attr"`
 		}
 		GroupRange []groupRange11
 	}
@@ -174,7 +174,7 @@ type installation11 Installation
 
 func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
-		Name        string         `xml:"Name,attr"`
+		Name        string         `xml:",attr"`
 		Areas       []area11       `xml:"Topology>Area"`
 		GroupRanges []groupRange11 `xml:"GroupAddresses>GroupRanges>GroupRange"`
 	}
