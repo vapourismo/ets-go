@@ -12,6 +12,8 @@ import (
 // InstallationFile is a file that contains zero or more project installations.
 type InstallationFile struct {
 	*zip.File
+
+	InstallationID string
 }
 
 // Decode the file in order to retrieve the project inside it.
@@ -48,7 +50,7 @@ func (pf *ProjectFile) Decode() (pi *ProjectInfo, err error) {
 	return
 }
 
-var projectFileBaseRe = regexp.MustCompile("^\\d.xml$")
+var projectFileBaseRe = regexp.MustCompile("^(\\d).xml$")
 
 func newProjectFile(archive *zip.ReadCloser, metaFile *zip.File) (projFile ProjectFile) {
 	projectDir := path.Dir(metaFile.Name)
@@ -58,8 +60,15 @@ func newProjectFile(archive *zip.ReadCloser, metaFile *zip.File) (projFile Proje
 
 	// Search for the project installation file.
 	for _, file := range archive.File {
-		if path.Dir(file.Name) == projectDir && projectFileBaseRe.MatchString(path.Base(file.Name)) {
-			projFile.InstallationFiles = append(projFile.InstallationFiles, InstallationFile{file})
+		if path.Dir(file.Name) != projectDir {
+			continue
+		}
+
+		if matches := projectFileBaseRe.FindStringSubmatch(path.Base(file.Name)); matches != nil {
+			projFile.InstallationFiles = append(projFile.InstallationFiles, InstallationFile{
+				File:           file,
+				InstallationID: matches[1],
+			})
 		}
 	}
 
@@ -101,7 +110,7 @@ func OpenExportArchive(path string) (*ExportArchive, error) {
 
 var (
 	projectMetaFileRe  = regexp.MustCompile("^(p|P)-([0-9a-zA-Z]+)/(p|P)roject.xml$")
-	manufacturerFileRe = regexp.MustCompile("^(m|M)-([0-9a-zA-Z]+)/(m|M)-([0-9a-zA-Z]+)([^.]+).xml$")
+	manufacturerFileRe = regexp.MustCompile("^(m|M)-([0-9a-zA-Z]+)/(m|M)-([^.]+).xml$")
 
 	// TODO: Figure out if '/' is a universal path seperator in ZIP files.
 )
@@ -114,7 +123,7 @@ func (ex *ExportArchive) findFiles() error {
 			ex.ManufacturerFiles = append(ex.ManufacturerFiles, ManufacturerFile{
 				File:           file,
 				ManufacturerID: "M-" + matches[2],
-				ContentID:      "M-" + matches[4] + matches[5],
+				ContentID:      "M-" + matches[4],
 			})
 		}
 	}
