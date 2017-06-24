@@ -9,15 +9,14 @@ import (
 	"io"
 )
 
-func getNamespace(start xml.StartElement) (ns string) {
+func getNamespace(start xml.StartElement) string {
 	for _, attr := range start.Attr {
 		if attr.Name.Local == "xmlns" {
-			ns = attr.Value
-			break
+			return attr.Value
 		}
 	}
 
-	return
+	return ""
 }
 
 // ProjectID is a project identifier.
@@ -35,14 +34,8 @@ func (pi *ProjectInfo) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace:
-		return unmarshalProjectInfo11(d, start, pi)
-
-	case schema12Namespace:
-		return unmarshalProjectInfo12(d, start, pi)
-
-	case schema13Namespace:
-		return unmarshalProjectInfo13(d, start, pi)
+	case schema11Namespace, schema12Namespace, schema13Namespace:
+		return d.DecodeElement((*projectInfo11)(pi), &start)
 
 	default:
 		return fmt.Errorf("Unexpected namespace '%s'", ns)
@@ -150,14 +143,8 @@ func (p *Project) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	// Decide which schema to use based on the value of the 'xmlns' attribute.
 	ns := getNamespace(start)
 	switch ns {
-	case schema11Namespace:
-		return unmarshalProject11(d, start, p)
-
-	case schema12Namespace:
-		return unmarshalProject12(d, start, p)
-
-	case schema13Namespace:
-		return unmarshalProject13(d, start, p)
+	case schema11Namespace, schema12Namespace, schema13Namespace:
+		return d.DecodeElement((*project11)(p), &start)
 
 	default:
 		return fmt.Errorf("Unexpected namespace '%s'", ns)

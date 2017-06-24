@@ -7,7 +7,9 @@ import "encoding/xml"
 
 const schema11Namespace = "http://knx.org/xml/project/11"
 
-func unmarshalProjectInfo11(d *xml.Decoder, start xml.StartElement, pi *ProjectInfo) error {
+type projectInfo11 ProjectInfo
+
+func (pi *projectInfo11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		Project struct {
 			ID                 string `xml:"Id,attr"`
@@ -198,7 +200,9 @@ func (i *installation11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) er
 	return nil
 }
 
-func unmarshalProject11(d *xml.Decoder, start xml.StartElement, p *Project) error {
+type project11 Project
+
+func (p *project11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
 	var doc struct {
 		Project struct {
 			ID            string           `xml:"Id,attr"`
