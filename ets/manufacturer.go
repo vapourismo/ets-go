@@ -30,15 +30,35 @@ type ComObject struct {
 	ReadOnInitFlag    bool
 }
 
+// ComObjectRef is an instance/reference to a communication object.
+type ComObjectRef struct {
+	ID                ComObjectRefID
+	RefID             ComObjectID
+	Name              *string
+	Text              *string
+	Description       *string
+	FunctionText      *string
+	ObjectSize        *string
+	DatapointType     *string
+	Priority          *string
+	ReadFlag          *bool
+	WriteFlag         *bool
+	CommunicationFlag *bool
+	TransmitFlag      *bool
+	UpdateFlag        *bool
+	ReadOnInitFlag    *bool
+}
+
 // ApplicationProgramID is the ID of an application program.
 type ApplicationProgramID string
 
 // ApplicationProgram is an application program.
 type ApplicationProgram struct {
-	ID      ApplicationProgramID
-	Name    string
-	Version uint
-	Objects []ComObject
+	ID         ApplicationProgramID
+	Name       string
+	Version    uint
+	Objects    []ComObject
+	ObjectRefs []ComObjectRef
 }
 
 // ManufacturerID is the ID of a manufacturer.

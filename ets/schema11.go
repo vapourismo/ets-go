@@ -266,6 +266,74 @@ func (co *comObject11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) erro
 	return nil
 }
 
+type comObjectRef11 ComObjectRef
+
+func (cor *comObjectRef11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
+	var doc struct {
+		ID                string  `xml:"Id,attr"`
+		RefID             string  `xml:"RefId,attr"`
+		Name              *string `xml:",attr"`
+		Text              *string `xml:",attr"`
+		Description       *string `xml:",attr"`
+		FunctionText      *string `xml:",attr"`
+		ObjectSize        *string `xml:",attr"`
+		DatapointType     *string `xml:",attr"`
+		Priority          *string `xml:",attr"`
+		ReadFlag          *string `xml:",attr"`
+		WriteFlag         *string `xml:",attr"`
+		CommunicationFlag *string `xml:",attr"`
+		TransmitFlag      *string `xml:",attr"`
+		UpdateFlag        *string `xml:",attr"`
+		ReadOnInitFlag    *string `xml:",attr"`
+	}
+
+	if err := d.DecodeElement(&doc, &start); err != nil {
+		return err
+	}
+
+	cor.ID = ComObjectRefID(doc.ID)
+	cor.RefID = ComObjectID(doc.RefID)
+	cor.Name = doc.Name
+	cor.Text = doc.Text
+	cor.Description = doc.Description
+	cor.FunctionText = doc.FunctionText
+	cor.ObjectSize = doc.ObjectSize
+	cor.DatapointType = doc.DatapointType
+	cor.Priority = doc.Priority
+
+	if doc.ReadFlag != nil {
+		cor.ReadFlag = new(bool)
+		*cor.ReadFlag = *doc.ReadFlag == "Enabled"
+	}
+
+	if doc.WriteFlag != nil {
+		cor.WriteFlag = new(bool)
+		*cor.WriteFlag = *doc.WriteFlag == "Enabled"
+	}
+
+	if doc.CommunicationFlag != nil {
+		cor.CommunicationFlag = new(bool)
+		*cor.CommunicationFlag = *doc.CommunicationFlag == "Enabled"
+	}
+
+	if doc.TransmitFlag != nil {
+		cor.TransmitFlag = new(bool)
+		*cor.TransmitFlag = *doc.TransmitFlag == "Enabled"
+	}
+
+	if doc.UpdateFlag != nil {
+		cor.UpdateFlag = new(bool)
+		*cor.UpdateFlag = *doc.UpdateFlag == "Enabled"
+	}
+
+	if doc.ReadOnInitFlag != nil {
+		cor.ReadOnInitFlag = new(bool)
+		*cor.ReadOnInitFlag = *doc.ReadOnInitFlag == "Enabled"
+	}
+
+	return nil
+}
+
 type applicationProgram11 ApplicationProgram
 
 func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElement) error {
@@ -274,7 +342,8 @@ func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 		Name    string `xml:",attr"`
 		Version uint   `xml:"ApplicationVersion,attr"`
 		Static  struct {
-			ComObjects []comObject11 `xml:"ComObjectTable>ComObject"`
+			Objects    []comObject11    `xml:"ComObjectTable>ComObject"`
+			ObjectRefs []comObjectRef11 `xml:"ComObjectRefs>ComObjectRef"`
 		}
 	}
 
@@ -285,10 +354,15 @@ func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 	ap.ID = ApplicationProgramID(doc.ID)
 	ap.Name = doc.Name
 	ap.Version = doc.Version
-	ap.Objects = make([]ComObject, len(doc.Static.ComObjects))
+	ap.Objects = make([]ComObject, len(doc.Static.Objects))
+	ap.ObjectRefs = make([]ComObjectRef, len(doc.Static.ObjectRefs))
 
-	for n, docComObj := range doc.Static.ComObjects {
+	for n, docComObj := range doc.Static.Objects {
 		ap.Objects[n] = ComObject(docComObj)
+	}
+
+	for n, docComObjRef := range doc.Static.ObjectRefs {
+		ap.ObjectRefs[n] = ComObjectRef(docComObjRef)
 	}
 
 	return nil
