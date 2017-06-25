@@ -285,10 +285,10 @@ func (ap *applicationProgram11) UnmarshalXML(d *xml.Decoder, start xml.StartElem
 	ap.ID = ApplicationProgramID(doc.ID)
 	ap.Name = doc.Name
 	ap.Version = doc.Version
-	ap.ComObjects = make([]ComObject, len(doc.Static.ComObjects))
+	ap.Objects = make([]ComObject, len(doc.Static.ComObjects))
 
 	for n, docComObj := range doc.Static.ComObjects {
-		ap.ComObjects[n] = ComObject(docComObj)
+		ap.Objects[n] = ComObject(docComObj)
 	}
 
 	return nil

@@ -35,10 +35,10 @@ type ApplicationProgramID string
 
 // ApplicationProgram is an application program.
 type ApplicationProgram struct {
-	ID         ApplicationProgramID
-	Name       string
-	Version    uint
-	ComObjects []ComObject
+	ID      ApplicationProgramID
+	Name    string
+	Version uint
+	Objects []ComObject
 }
 
 // ManufacturerID is the ID of a manufacturer.
