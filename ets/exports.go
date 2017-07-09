@@ -33,12 +33,28 @@ func (i *InstallationFile) Decode() (p *Project, err error) {
 type ProjectFile struct {
 	*zip.File
 
-	ProjectID         string
+	ProjectID         ProjectID
 	InstallationFiles []InstallationFile
 }
 
-// Decode the file in order to retrieve the project info inside it.
-func (pf *ProjectFile) Decode() (pi *ProjectInfo, err error) {
+// Decode the entire project.
+func (pf *ProjectFile) Decode() (p *Project, err error) {
+	p = &Project{ID: pf.ProjectID}
+
+	for _, instFile := range pf.InstallationFiles {
+		proj, err := instFile.Decode()
+		if err != nil {
+			return nil, err
+		}
+
+		proj.Installations = append(proj.Installations, proj.Installations...)
+	}
+
+	return
+}
+
+// DecodeInfo the file in order to retrieve the project info inside it.
+func (pf *ProjectFile) DecodeInfo() (pi *ProjectInfo, err error) {
 	r, err := pf.Open()
 	if err != nil {
 		return
@@ -56,7 +72,7 @@ func newProjectFile(archive *zip.ReadCloser, metaFile *zip.File) (projFile Proje
 	projectDir := path.Dir(metaFile.Name)
 
 	projFile.File = metaFile
-	projFile.ProjectID = projectDir
+	projFile.ProjectID = ProjectID(projectDir)
 
 	// Search for the project installation file.
 	for _, file := range archive.File {
