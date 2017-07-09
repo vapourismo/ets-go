@@ -34,29 +34,13 @@ Not all files within the export might be relevant to you. Therefore, no files ar
 automatically.
 
 	for _, projFile := range archive.ProjectFiles {
-		projInfo, err := projFile.Decode()
+		proj, err := projFile.Decode()
 		if err != nil {
 			log.Println(err)
 			continue
 		}
 
-		// Variable projInfo contains the project info described in the projFile.
-		fmt.Println("Project", projInfo.Name)
-	}
-
-This decodes only the basic project information. The actual project is contained in the installation
-files. Each installation file can contain multiple project installations. Yes, this is weird.
-
-	for _, instFile := range projFile.InstallationFiles {
-		proj, err := instFile.Decode()
-		if err != nil {
-			log.Println(err)
-			continue
-		}
-
-		for _, inst := range proj.Installations {
-			fmt.Println("Installation", inst.Name)
-		}
+		fmt.Println("Project", proj.Name)
 	}
 
 */
